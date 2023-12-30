@@ -1,38 +1,40 @@
+import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-admin-auth',
   templateUrl: './admin-auth.component.html',
-  styleUrls: ['./admin-auth.component.css'],
+  styleUrls: ['./admin-auth.component.css']
 })
 export class AdminAuthComponent {
-  username: string = '';
-  password: string = '';
-  errorMessage: string = '';
+  email: string = "";
+  password: string = "";
 
-  constructor(private router: Router, private http: HttpClient) {}
+  constructor(private router: Router , private http: HttpClient) {}
 
   login() {
-    this.errorMessage = '';
+    console.log(this.email);
+    console.log(this.password);
 
-    const loginDTO = { email: this.username, password: this.password };
+    const bodyData = {
+      email: this.email,
+      password: this.password,
+    };
 
-    this.http.post<any>('http://your-backend-url/api/v1/admins/login', loginDTO)
-      .subscribe(
-        (response) => {
-          console.log('Login successful', response);
-          this.router.navigate(['/complete-navbar']);
-        },
-        (error) => {
-          console.error('Login failed', error);
-          this.errorMessage = 'Invalid username or password';
-        }
-      );
+    this.http.post("http://localhost:3001/api/v1/admins/login", bodyData).subscribe((resultData: any) => {
+      console.log(resultData);
+
+      if (resultData.error) {
+        alert("Login failed: " + resultData.error);
+      } else {
+        alert("Login Success");
+        this.router.navigate(['/complete-navbar']); // Redirect to the home page
+      }
+    });
   }
-
   forgotPassword() {
+    
     console.log('Forgot Password function called');
   }
 }

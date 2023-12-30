@@ -44,6 +44,7 @@ import { StoryComponent } from './story/story.component';
 import { ContactpartnerComponent } from './contactpartner/contactpartner.component';
 import { SeoComponent } from './seo/seo.component';
 import { CoachComponent } from './coach/coach.component';
+import { HttpClientModule } from '@angular/common/http';
 
 
 
@@ -91,17 +92,7 @@ import { CoachComponent } from './coach/coach.component';
    
     ContactpartnerComponent,
     SeoComponent,
-    CoachComponent,
-   
-   
-    
-   
-    
-    
-   
-  
-    
-  
+    CoachComponent,  
   ],
   imports: [
     BrowserModule,
@@ -110,6 +101,7 @@ import { CoachComponent } from './coach/coach.component';
     NgChartsModule,
     ReactiveFormsModule,
     FileUploadModule,
+    HttpClientModule,
   ],
   providers: [],
   bootstrap: [AppComponent]

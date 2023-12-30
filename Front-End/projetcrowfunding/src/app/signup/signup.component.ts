@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 
@@ -7,42 +8,52 @@ import { Router } from '@angular/router';
   styleUrls: ['./signup.component.css']
 })
 export class SignupComponent {
-  firstname: string = "";
-  lastname: string = "";
-  email: string = "";
-  phone: string = "";
-  city: string = "";
-  state: string = "";
-  password: string = "";
-  confirmPassword: string = "";
-  membershipType: string = "";
-  errorMessage :string="";
-  constructor(private router: Router) { }
+  firstname: string = '';
+  lastname: string = '';
+  email: string = '';
+  phone: string = '';
+  city: string = '';
+  state: string = '';
+  password: string = '';
+  confirmPassword: string = '';
+  membershipType: string = '';
+
+  errorMessage: string = '';
+
+  constructor(private router: Router, private http: HttpClient) {}
 
   signup() {
-    console.log('Sign up button clicked');
-    console.log('First Name:', this.firstname);
-    console.log('Last Name:', this.lastname);
-    console.log('Email:', this.email);
-    console.log('Phone:', this.phone);
-    console.log('City:', this.city);
-    console.log('State:', this.state);
-    console.log('Password:', this.password);
-    console.log('Confirm Password:', this.confirmPassword);
-    console.log('Membership Type:', this.membershipType);
-
-    
-
-    
-      
-      if (this.membershipType === 'visitor') {
-        
-        this.router.navigate(['/donation-form']);
-      } else if (this.membershipType === 'member') {
-        
-        this.router.navigate(['/navbar-creat']);
-      }
+    // Check if passwords match
+    if (this.password !== this.confirmPassword) {
+      this.errorMessage = 'Passwords do not match';
+      return;
     }
-  }
-  
 
+    // Prepare data to send to the backend
+    const signupData = {
+      firstName: this.firstname,
+      lastName: this.lastname,
+      email: this.email,
+      phoneNumber: this.phone,
+      city: this.city,
+      state: this.state,
+      password: this.password,
+      membershipType: this.membershipType
+    };
+
+    // Send the data to the backend API
+    this.http.post('http://localhost:3001/api/v1/members/register', signupData)
+      .subscribe(
+        (response: any) => {
+          // Registration successful, you may handle the response accordingly
+          console.log(response);
+          this.router.navigate(['/navbar-creat']); // Redirect to login page after successful signup
+        },
+        (error: any) => {
+          // Registration failed, handle the error
+          console.error(error);
+          this.errorMessage = 'Registration failed. Please try again.';
+        }
+      );
+  }
+}
