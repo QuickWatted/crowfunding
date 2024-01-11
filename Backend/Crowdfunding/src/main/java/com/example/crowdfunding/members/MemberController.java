@@ -8,7 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -68,23 +70,44 @@ public class MemberController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+    public ResponseEntity<Map<String, String>> forgotPassword(@RequestBody ForgotPasswordRequest request) {
         Member member = memberService.findByEmail(request.getEmail());
         if (member == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Member not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Collections.singletonMap("message", "Member not found"));
         }
 
-        passwordResetTokenService.createToken(member);
-        // Send resetToken.getToken() to the member via email
+        try {
+            passwordResetTokenService.createToken(member);
+            // Send resetToken.getToken() to the member via email
 
-        return ResponseEntity.ok("Password reset instructions sent to your email");
+            return ResponseEntity.ok(Collections.singletonMap("message", "Password reset instructions sent to your email"));
+        } catch (Exception e) {
+            // Log the exception for debugging
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Collections.singletonMap("message", "Error sending password reset instructions"));
+        }
     }
+
+
+    @PostMapping("/validate-token")
+    public ResponseEntity<Map<String, String>> validateToken(@RequestBody String token) {
+        if (!passwordResetTokenService.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Collections.singletonMap("message", "Invalid or expired token"));
+        }
+        return ResponseEntity.ok(Collections.singletonMap("message", "Token is valid"));
+    }
+
+
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequest request) {
+        // Validate the token
         if (!passwordResetTokenService.validateToken(request.getToken())) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
         }
+
+        // Reset the password
         passwordResetTokenService.resetPassword(request.getToken(), request.getNewPassword());
+
         return ResponseEntity.ok("Password reset successfully");
     }
 }

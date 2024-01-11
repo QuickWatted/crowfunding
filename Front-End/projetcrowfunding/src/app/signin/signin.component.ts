@@ -13,24 +13,24 @@ export class SigninComponent {
     remember: boolean = false;
 
     constructor(private router: Router , private http: HttpClient) {}
-  
+
     login() {
       console.log(this.email);
       console.log(this.password);
-  
+
       const bodyData = {
         email: this.email,
         password: this.password,
       };
-  
+
       this.http.post("http://localhost:3001/api/v1/members/login", bodyData).subscribe((resultData: any) => {
         console.log(resultData);
-  
+
         if (resultData.error) {
           alert("Login failed: " + resultData.error);
         } else {
           alert("Login Success");
-          this.router.navigate(['/complete-navbar']); // Redirect to the home page
+          this.router.navigate(['/navbar-creat']); // Redirect to the home page
         }
       });
     }
@@ -40,7 +40,7 @@ export class SigninComponent {
   }
 
   private saveUserCredentials() {
-    
+
     console.log('User credentials saved for 30 days');
   }
 }
